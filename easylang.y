@@ -65,6 +65,7 @@ sentencia: asignacion
     | declaracion
     | ciclo_do
     | ciclo_for 
+    | condicional
 ;
 
 asignacion: ID ASIGNACION expresion
@@ -73,10 +74,23 @@ asignacion: ID ASIGNACION expresion
 ciclo_for: FOR ID ASIGNACION expresion TO expresion DO BEGIN1 bloque END
 ;
 
-ciclo_do: DO BEGIN1 bloque END WHILE PARIZQ condicion PARDER
+ciclo_do: DO sentencia PUNTOYCOMA WHILE PARIZQ condicion PARDER
 ;
 
-condicion: expresion MENOR expresion
+condicional: IF PARIZQ condicion PARDER THEN BEGIN1 bloque END ELSE BEGIN1 bloque END
+;
+
+condicion: comparacion
+    | condicion AND comparacion
+    | condicion OR comparacion
+;
+
+comparacion: expresion MENOR expresion
+    | expresion MAYOR expresion
+    | expresion MENORIGUAL expresion
+    | expresion MAYORIGUAL expresion
+    | expresion IGUAL expresion
+    | expresion DIFERENTE expresion
 ;
 
 expresion: expresion SUMA termino
