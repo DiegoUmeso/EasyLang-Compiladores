@@ -1,4 +1,3 @@
-
 %{
 #include <stdio.h>
 
@@ -64,9 +63,20 @@ sentencia: asignacion
     | lectura
     | escritura
     | declaracion
+    | ciclo_do
+    | ciclo_for 
 ;
 
 asignacion: ID ASIGNACION expresion
+;
+
+ciclo_for: FOR ID ASIGNACION expresion TO expresion DO BEGIN1 bloque END
+;
+
+ciclo_do: DO BEGIN1 bloque END WHILE PARIZQ condicion PARDER
+;
+
+condicion: expresion MENOR expresion
 ;
 
 expresion: expresion SUMA termino
@@ -74,8 +84,12 @@ expresion: expresion SUMA termino
     | termino
 ;
 
-termino: termino MULTIPLICACION factor
-    | termino DIVISION factor
+termino: termino MULTIPLICACION potencia
+    | termino DIVISION potencia
+    | potencia
+;
+
+potencia: factor POTENCIA potencia
     | factor
 ;
 
@@ -106,7 +120,9 @@ vacio:
 %%
 
 int main(void) {
-    yyparse();
+    if (yyparse() == 0) {
+        printf("Sintaxis correcta\n");
+    }
     return 0;
 }
 
