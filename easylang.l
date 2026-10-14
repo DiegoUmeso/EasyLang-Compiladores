@@ -17,7 +17,7 @@
 "ELSE"                  { return ELSE; }
 "AND"                   { return AND; }
 "OR"                    { return OR; }
-"DO"                    { return DO; }
+"DO"|"do"                    { return DO; }
 "WHILE"                 { return WHILE; }
 "FOR"                   { return FOR; }
 "to"                    { return TO; }
@@ -51,6 +51,6 @@
 
 \n                      { /* Ignorar saltos de linea */ }
 
-.                       { printf("Error lexico en linea %d: %s\n", yylineno, yytext); }
+.                       { printf("Error lexico en linea %d: %s\n", yylineno, yytext); return -1;}
 
 %%
