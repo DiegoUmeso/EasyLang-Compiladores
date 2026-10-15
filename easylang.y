@@ -1,4 +1,3 @@
-
 %{
 #include <stdio.h>
 
@@ -149,6 +148,7 @@ int main(void) {
         printf("Sintaxis correcta\n");
         return 0;
     }
+
     return 1;
 }
 
