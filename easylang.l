@@ -1,11 +1,9 @@
-
 %{
 #include <stdio.h>
 #include "easylang.tab.h"
 %}
 
 %option yylineno noyywrap
-%x COMENTARIO
 
 %%
 
@@ -25,16 +23,7 @@
 "FOR"                   { return FOR; }
 "to"                    { return TO; }
 
-"***"                   { BEGIN(COMENTARIO); }
-<COMENTARIO>"***"       { BEGIN(INITIAL); }
-<COMENTARIO>[^*\n]+     { }
-<COMENTARIO>"*"         { }
-<COMENTARIO>\n          { }
-<COMENTARIO><<EOF>>     {
-    fprintf(stderr, "Error lexico en linea %d: comentario sin cerrar\n", yylineno);
-    BEGIN(INITIAL);
-    return INVALIDO;
-}
+"***"([^*]|\*[^*]|\*\*[^*])*"***"    { }
 
 "**"                    { return POTENCIA; }
 "+"                     { return SUMA; }
