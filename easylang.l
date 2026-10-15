@@ -43,7 +43,7 @@
 "("                     { return PARIZQ; }
 ")"                     { return PARDER; }
 
-[0-9]+                  { return NUMERO; }
+-?[0-9]+                  { return NUMERO; }
 
 [a-zA-Z][a-zA-Z0-9]*    { return ID; }
 
