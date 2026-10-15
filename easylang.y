@@ -1,3 +1,4 @@
+
 %{
 #include <stdio.h>
 
@@ -24,6 +25,7 @@ int yyparse(void);
 
 %token ID
 %token NUMERO
+%token INVALIDO
 
 %token SUMA
 %token RESTA
@@ -52,19 +54,23 @@ inicio: programa
 programa: MAIN BEGIN1 bloque END
 ;
 
-bloque: sentencia PUNTOYCOMA otra_sentencia
+bloque: elemento
+    | bloque elemento
 ;
 
-otra_sentencia: sentencia PUNTOYCOMA otra_sentencia
-    | vacio
+elemento: sentencia_simple PUNTOYCOMA
+    | sentencia_compuesta
+    | sentencia_compuesta PUNTOYCOMA
 ;
 
-sentencia: asignacion
+sentencia_simple: asignacion
     | lectura
     | escritura
     | declaracion
-    | ciclo_do
-    | ciclo_for 
+;
+
+sentencia_compuesta: ciclo_do
+    | ciclo_for
     | condicional
 ;
 
@@ -74,7 +80,11 @@ asignacion: ID ASIGNACION expresion
 ciclo_for: FOR ID ASIGNACION expresion TO expresion DO BEGIN1 bloque END
 ;
 
-ciclo_do: DO sentencia PUNTOYCOMA WHILE PARIZQ condicion PARDER
+ciclo_do: DO instrucciones_do WHILE PARIZQ condicion PARDER
+;
+
+instrucciones_do: sentencia_simple PUNTOYCOMA
+    | instrucciones_do sentencia_simple PUNTOYCOMA
 ;
 
 condicional: IF PARIZQ condicion PARDER THEN BEGIN1 bloque END ELSE BEGIN1 bloque END
@@ -108,6 +118,7 @@ potencia: factor POTENCIA potencia
 ;
 
 factor: PARIZQ expresion PARDER
+    | RESTA factor
     | ID
     | NUMERO
 ;
@@ -136,14 +147,15 @@ vacio:
 int main(void) {
     if (yyparse() == 0) {
         printf("Sintaxis correcta\n");
+        return 0;
     }
-    return 0;
+    return 1;
 }
 
 void yyerror(const char *mensaje) {
     extern int yylineno;
-    extern char* yytext;
+    extern char *yytext;
 
-    fprintf(stderr, "Error: %s en la linea %i cerca de %s\n",
+    fprintf(stderr, "Error: %s en la linea %d cerca de %s\n",
             mensaje, yylineno, yytext);
 }
