@@ -1,8 +1,11 @@
+
 %{
+#include <stdio.h>
 #include "easylang.tab.h"
 %}
 
-%option yylineno
+%option yylineno noyywrap
+%x COMENTARIO
 
 %%
 
@@ -17,12 +20,21 @@
 "ELSE"                  { return ELSE; }
 "AND"                   { return AND; }
 "OR"                    { return OR; }
-"DO"|"do"                    { return DO; }
+"DO"|"do"               { return DO; }
 "WHILE"                 { return WHILE; }
 "FOR"                   { return FOR; }
 "to"                    { return TO; }
 
-"***"([^*]|\*+[^*])*\*{3}    { /* Ignorar comentarios */ }
+"***"                   { BEGIN(COMENTARIO); }
+<COMENTARIO>"***"       { BEGIN(INITIAL); }
+<COMENTARIO>[^*\n]+     { }
+<COMENTARIO>"*"         { }
+<COMENTARIO>\n          { }
+<COMENTARIO><<EOF>>     {
+    fprintf(stderr, "Error lexico en linea %d: comentario sin cerrar\n", yylineno);
+    BEGIN(INITIAL);
+    return INVALIDO;
+}
 
 "**"                    { return POTENCIA; }
 "+"                     { return SUMA; }
@@ -43,14 +55,15 @@
 "("                     { return PARIZQ; }
 ")"                     { return PARDER; }
 
--?[0-9]+                  { return NUMERO; }
+[0-9]+                  { return NUMERO; }
 
 [a-zA-Z][a-zA-Z0-9]*    { return ID; }
 
-[ \t]                   { /* Ignorar espacios */ }
+[ \t\r\n]+              { }
 
-\n                      { /* Ignorar saltos de linea */ }
-
-.                       { printf("Error lexico en linea %d: %s\n", yylineno, yytext); return -1;}
+.                       {
+    fprintf(stderr, "Error lexico en linea %d: %s\n", yylineno, yytext);
+    return INVALIDO;
+}
 
 %%
